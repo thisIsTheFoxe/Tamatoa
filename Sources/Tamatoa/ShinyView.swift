@@ -23,33 +23,38 @@ public extension View {
     ///   - contentMode: The `ContentMode` used to fit or fill the highlight surface. Defaults to `.fit`.
     ///   - dampening: A tuple specifying how much to reduce the effect of each attitude axis `(pitch, yaw, roll)`. Values between 0 and 1.
     ///                Lower values produce a more pronounced response, while higher values dampen the effect.
-    ///                Defaults to `(0.9, 1.0, 0.0)`.
+    ///                Defaults to `(0.75, 1.0, 0.75)`.
     ///
     /// - Note: The `MotionManager` must be actively updating motion data for this effect to work. Ensure that `startDeviceMotionUpdates()` is called appropriately in your app.
     ///
     /// - Returns: A view with a shiny, interactive, card-like appearance that responds to device motion.
     @ViewBuilder
-    func shinyCard(_ surface: Gradient = .highlight,
+    func shinyCard(_ surface: Gradient = .spotlight,
                    has3DEffect: Bool = true,
                    contentMode: ContentMode = .fit,
-                   dampening: AttitudeDampening = (0.9, 1.0, 0.0)) -> some View {
+                   dampening: AttitudeDampening = (0.6, 1.0, 0.75),
+                   isActive: Bool = true) -> some View {
         modifier(ShinyCardModifier(surface: surface,
                                    has3DEffect: has3DEffect,
                                    contentMode: contentMode,
                                    attitudeScaling: (1 - dampening.pitch,
                                                      1 - dampening.yaw,
-                                                     1 - dampening.roll)))
+                                                     1 - dampening.roll),
+                                   isActive: isActive))
         .environmentObject(MotionManager.main)
     }
 }
 
 struct ShinyCardModifier: ViewModifier {
+    @Environment(\.isEnabled) var isEnabled
+    
     @EnvironmentObject var model: MotionManager
     
     let surface: Gradient
     let has3DEffect: Bool
     let contentMode: ContentMode
     let attitudeScaling: AttitudeDampening
+    let isActive: Bool
     
     func position(in rect: CGRect) -> CGSize {
         let x = 0 - (CGFloat(model.roll) / .pi * 4) * rect.height
@@ -81,19 +86,23 @@ struct ShinyCardModifier: ViewModifier {
             content
                 .position(x: localFrame.midX, y: localFrame.midY)
                 .overlay {
-                    RadialGradient(
-                        gradient: surface,
-                        center: .center,
-                        startRadius: 1,
-                        endRadius: radius(localFrame))
-                    .scaleEffect(scale(proxy))
-                    .rotationEffect(.radians(localFrame.diagonalAngle()))
-                    .offset(position(in: localFrame))
-                    .mask(content)
+                    if isActive && isEnabled {
+                        RadialGradient(
+                            gradient: surface,
+                            center: .center,
+                            startRadius: 1,
+                            endRadius: radius(localFrame))
+                        .scaleEffect(scale(proxy))
+                        .rotationEffect(.radians(localFrame.diagonalAngle()))
+                        .offset(position(in: localFrame))
+                        .mask(content)
+                    }
                 }
-                .rotation3DEffect(.radians(Double(angle * 0.4)),
-                                  axis: (x: axis.x, y: axis.y, z: axis.z))
+                // always apply default damping on top of custom damping too
+                .rotation3DEffect(isActive && isEnabled ? .radians(Double(angle * 0.4)) : .zero,
+                                  axis: isActive && isEnabled ? (x: axis.x, y: axis.y, z: axis.z) : (0, 0, 0))
                 .animation(.linear(duration: 0.1), value: model.totalRotation)
+                .animation(.default, value: isActive && isEnabled)
         }
     }
 }

@@ -46,6 +46,6 @@ import CoreGraphics
 extension CGRect {
     /// Returns the diagonal angle of the rectangle in radians.
     func diagonalAngle() -> CGFloat {
-        atan2(height, width)
+        atan2(width, height)
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 public extension Gradient {
-    static let highlight = Gradient(colors: [
+    static let spotlight = Gradient(colors: [
         .white.opacity(0.4),
         .white.opacity(0.2),
         .white.opacity(0.1),
@@ -16,8 +16,23 @@ public extension Gradient {
         .white.opacity(0)
     ])
     
-    static let basicHighlight = Gradient(colors: [
+    static let basicSpotlight = Gradient(colors: [
         .white.opacity(0.4),
         .white.opacity(0.00)
     ])
+    
+    static let matte = Gradient(colors: [
+        .white.opacity(0.2),
+        .white.opacity(0.2),
+        .white.opacity(0.1),
+        .white.opacity(0.08),
+        .white.opacity(0)
+    ])
+}
+
+#Preview {
+    VStack {
+        RadialGradient(gradient: .matte, center: .center, startRadius: 1, endRadius: 200)
+    }
+    .background(.black)
 }
