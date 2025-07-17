@@ -5,6 +5,7 @@ import PackageDescription
 
 let package = Package(
     name: "Tamatoa",
+    platforms: [.iOS(.v15)],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
