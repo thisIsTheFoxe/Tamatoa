@@ -7,6 +7,7 @@
 
 import SwiftUI
 import CoreMotion
+import simd
 
 public typealias AttitudeDampening = (pitch: CGFloat, yaw: CGFloat, roll: CGFloat)
 
@@ -23,7 +24,7 @@ public extension View {
     ///   - contentMode: The `ContentMode` used to fit or fill the highlight surface. Defaults to `.fit`.
     ///   - dampening: A tuple specifying how much to reduce the effect of each attitude axis `(pitch, yaw, roll)`. Values between 0 and 1.
     ///                Lower values produce a more pronounced response, while higher values dampen the effect.
-    ///                Defaults to `(0.75, 1.0, 0.75)`.
+    ///                Defaults to `(0.6, 1.0, 0.75)`.
     ///
     /// - Note: The `MotionManager` must be actively updating motion data for this effect to work. Ensure that `startDeviceMotionUpdates()` is called appropriately in your app.
     ///
@@ -76,13 +77,22 @@ struct ShinyCardModifier: ViewModifier {
         contentMode == .fill ? max(rect.width / 2, rect.height / 2) : min(rect.width / 2, rect.height / 2)
     }
     
+    func axisAndAngle3DRotation() -> (simd_double3, Double) {
+        if has3DEffect && isActive && isEnabled {
+            eulerToAxisAngle(pitch: model.userDevicePitch,
+                             yaw: model.yaw,
+                             roll: model.roll,
+                             scaling: attitudeScaling)
+        } else {
+            (.zero, .zero)
+        }
+    }
+    
     func body(content: Content) -> some View {
         GeometryReader { proxy in
             let localFrame = proxy.frame(in: .local)
-            let (axis, angle) = eulerToAxisAngle(pitch: model.userDevicePitch,
-                                                 yaw: model.yaw,
-                                                 roll: model.roll,
-                                                 scaling: attitudeScaling)
+            let (axis, angle) = axisAndAngle3DRotation()
+            
             content
                 .position(x: localFrame.midX, y: localFrame.midY)
                 .overlay {
@@ -99,8 +109,7 @@ struct ShinyCardModifier: ViewModifier {
                     }
                 }
                 // always apply default damping on top of custom damping too
-                .rotation3DEffect(isActive && isEnabled ? .radians(Double(angle * 0.4)) : .zero,
-                                  axis: isActive && isEnabled ? (x: axis.x, y: axis.y, z: axis.z) : (0, 0, 0))
+                .rotation3DEffect(.radians(angle * 0.4), axis: (x: axis.x, y: axis.y, z: axis.z))
                 .animation(.linear(duration: 0.1), value: model.totalRotation)
                 .animation(.default, value: isActive && isEnabled)
         }
