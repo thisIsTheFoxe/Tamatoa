@@ -21,6 +21,10 @@ public class MotionManager: ObservableObject {
         pitch + defaultUserDeviceAngle.radians
     }
     
+    public var isTrackingMotion: Bool {
+        motionInput.isDeviceMotionActive
+    }
+    
     /// The default angle for the user's device orientation, used to calibrate or offset the device's pitch measurement.
     ///
     /// This value is typically set to match the most common resting or ergonomic usage angle, allowing for more accurate
@@ -47,9 +51,10 @@ public class MotionManager: ObservableObject {
     }
     
     public func startDeviceMotionUpdates() throws {
-        guard !motionInput.isDeviceMotionActive else {
+        guard !isTrackingMotion else {
             return
         }
+        
         guard motionInput.isDeviceMotionAvailable else {
             throw NSError(domain: "MotionManagerError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Device motion is not available."])
         }
@@ -71,7 +76,7 @@ public class MotionManager: ObservableObject {
     }
     
     public func stopDeviceMotionUpdates() {
-        if motionInput.isDeviceMotionActive {
+        if isTrackingMotion {
             motionInput.stopDeviceMotionUpdates()
             yaw = 0
             pitch = 0

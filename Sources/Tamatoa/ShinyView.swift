@@ -78,7 +78,7 @@ struct ShinyCardModifier: ViewModifier {
     }
     
     func axisAndAngle3DRotation() -> (simd_double3, Double) {
-        if has3DEffect && isActive && isEnabled {
+        if has3DEffect && isActive && isEnabled && model.isTrackingMotion {
             eulerToAxisAngle(pitch: model.userDevicePitch,
                              yaw: model.yaw,
                              roll: model.roll,
