@@ -5,8 +5,6 @@
 //  Created by Henrik Storch on 17/07/2025
 //
 
-
-
 import simd
 
 /// Converts pitch, yaw, roll (in radians) to axis-angle rotation.

@@ -29,10 +29,15 @@ Inspired by [maustinstar/shiny](https://github.com/maustinstar/shiny) and a cert
 
 ---
 
-## Installation
+## Usage
 
 Add Tamatoa to your project as a Swift Package:
 
 1. In Xcode, go to **File > Add Packages…**
 2. Enter this repository URL:
-
+```
+https://github.com/thisIsTheFoxe/Tamatoa
+```
+3. `import Tamatoa` in your SwiftUI view
+4. Ensure you call `MotionManager.startDeviceMotionUpdates()` in your app before you want to use the framework
+5. Use the `.shinyCard()` on any SwiftUI view.

@@ -27,9 +27,8 @@ public class MotionManager: ObservableObject {
     
     /// The default angle for the user's device orientation, used to calibrate or offset the device's pitch measurement.
     ///
-    /// This value is typically set to match the most common resting or ergonomic usage angle, allowing for more accurate
-    /// interpretation of the user's device pitch. For example, a negative value assumes the device is tilted slightly toward
-    /// the user by default, such as when holding a slightly phone upright.
+    /// This value represents the typical ergonomic angle for the device, improving pitch accuracy.
+    /// A negative value assumes the device is slightly tilted toward the user, such as when held upright.
     ///
     /// Adjust this value if your application assumes a different neutral device orientation.
     public var defaultUserDeviceAngle: Angle = Angle.degrees(-25)
@@ -43,7 +42,7 @@ public class MotionManager: ObservableObject {
     /// - Parameter interval: The time interval between each device motion update. A lower value results in more frequent motion data readings
     ///  but potentially higher power consumption.
     ///
-    /// The default interval is set to 0.1 seconds.
+    /// The default interval is set to 0.1 seconds (10 Hz).
     ///
     /// - Note: The actual delivery rate may be affected by system conditions, such as device performance limitations or power-saving modes.
     public func setMotionUpdateInterval(_ interval: TimeInterval) {
